@@ -31,20 +31,17 @@
 
 ```bash
 # 使用默认端口和密码
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/zaqbest/anytls.sh/main/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/zaqbest/anytls.sh/refs/heads/master/install.sh)"
 
 # 指定端口和密码（注意 _ 是必需的占位符）
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/zaqbest/anytls/main/install.sh)" _ -p 8443 -s mypassword
-
-# 使用自定义域名
-sh -c "$(curl -fsSL https://install-anytls.zaqbest.com)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/zaqbest/anytls.sh/refs/heads/master/install.sh)" _ -p 8443 -s mypassword
 ```
 
 ### 方式二：本地下载执行
 
 ```bash
 # 下载脚本
-curl -fsSL -o install.sh https://raw.githubusercontent.com/zaqbest/anytls.sh/main/install.sh
+curl -fsSL -o install.sh https://raw.githubusercontent.com/zaqbest/anytls.sh/refs/heads/master/install.sh 
 chmod +x install.sh
 
 # 默认安装
