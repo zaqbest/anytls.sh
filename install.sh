@@ -574,9 +574,22 @@ get_public_ip() {
     echo "$ip"
 }
 
+# 基于 IP 后 2 段生成 Surge 节点名前缀
+node_prefix() {
+    local ip="$1"
+    local last2
+    last2="$(echo "${ip}" | awk -F. '{print $3"-"$4}' 2>/dev/null || true)"
+    if [ -z "${last2}" ] || [ "${last2}" = "-" ]; then
+        echo "anytls"
+    else
+        echo "at-${last2}"
+    fi
+}
+
 show_result() {
-    local public_ip
+    local public_ip prefix
     public_ip="$(get_public_ip)"
+    prefix="$(node_prefix "${public_ip}")"
 
     local impl_label="Go 官方版"
     [ "$IMPL" = "rust" ] && impl_label="Rust 社区版"
@@ -592,6 +605,12 @@ show_result() {
     echo -e " ${BLUE}安装目录${PLAIN}   : ${INSTALL_DIR}"
     echo -e " ${BLUE}配置文件${PLAIN}   : ${CONFIG_FILE}"
     echo -e " ${BLUE}日志文件${PLAIN}   : ${LOG_FILE}"
+    echo -e "${GREEN}------------------------------------------------${PLAIN}"
+    echo -e "${YELLOW}# Surge / Stash / Loon [Proxy] 直接复制:${PLAIN}"
+    echo "${prefix} = anytls, ${public_ip}, ${PORT}, password=${PASSWORD}, sni=bing.com, skip-cert-verify=true, udp-relay=true"
+    echo
+    echo -e "${YELLOW}# 通用 URL:${PLAIN}"
+    echo "anytls://${PASSWORD}@${public_ip}:${PORT}/?sni=bing.com&insecure=1#${prefix}"
     echo -e "${GREEN}------------------------------------------------${PLAIN}"
     if [ "$INIT_SYSTEM" = "systemd" ]; then
         echo -e " 服务管理:"
@@ -610,6 +629,21 @@ show_result() {
     echo -e " 卸载 : ${YELLOW}bash install-anytls.sh --uninstall${PLAIN}"
     echo -e "${GREEN}================================================${PLAIN}"
     echo
+
+    # 同时写入客户端信息文件
+    cat > "${INSTALL_DIR}/client_info.txt" <<CIEOF
+  AnyTLS server info (client reference)
+Server IP : ${public_ip}
+Port      : ${PORT}
+Password  : ${PASSWORD}
+
+# Surge / Stash / Loon [Proxy] 直接复制:
+${prefix} = anytls, ${public_ip}, ${PORT}, password=${PASSWORD}, sni=bing.com, skip-cert-verify=true, udp-relay=true
+
+# 通用 URL:
+anytls://${PASSWORD}@${public_ip}:${PORT}/?sni=bing.com&insecure=1#${prefix}
+CIEOF
+    chmod 600 "${INSTALL_DIR}/client_info.txt"
 }
 
 main() {
