@@ -588,16 +588,16 @@ get_region() {
     echo "${region}"
 }
 
-# 生成节点名字基础前缀:  Node-Proxy-<REGION>-<IP-LAST2>
+# 生成节点名字基础前缀:  N-P-<REGION>-<IP-LAST2>
 node_prefix() {
     local ip="$1" region="$2"
     local last1 last2
     last1="$(echo "${ip}" | awk -F. '{print $3}' 2>/dev/null || true)"
     last2="$(echo "${ip}" | awk -F. '{print $4}' 2>/dev/null || true)"
     if [ -z "${last1}" ] || [ -z "${last2}" ]; then
-        echo "Node-Proxy-${region}"
+        echo "N-P-${region}"
     else
-        echo "Node-Proxy-${region}-${last1}-${last2}"
+        echo "N-P-${region}-${last1}-${last2}"
     fi
 }
 
